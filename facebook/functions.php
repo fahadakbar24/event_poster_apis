@@ -122,3 +122,18 @@ function fetchPagePostIds($page_id, $access_token){
         printVars($post_ids);
     }
 }
+
+function deletePagePosts($post_id, $access_token){
+    $response = makeApiReq(
+        "get",
+        "{$post_id}?method=delete&access_token={$access_token}",
+        ""
+    );
+
+    if (!isset($response["success"])) {
+        echo "Error deleting post from Facebook Page";
+        printVars($response);
+    } else {
+        echo "Deleted post from Facebook Page";
+    }
+}
