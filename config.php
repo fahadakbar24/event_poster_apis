@@ -1,5 +1,6 @@
 <?php
 return [
+    "domain" => "http://localhost/",
     "fb_api_ver" => "v16.0",
     "fb_app_id" => "639879514575287",
     "fb_app_secret" => "33b9101211b1d54cf1743529f3fe8a52",

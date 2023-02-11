@@ -8,11 +8,23 @@ function printVars($var){
     echo "<pre/><br/><br/>";
 }
 
-function redirectToLogin(){
+function redirectToFBLogin(){
     global $configs, $redirect_uri;
 
     session_unset();
     header("Location: https://www.facebook.com/dialog/oauth?client_id={$configs['fb_app_id']}&redirect_uri={$redirect_uri}&scope={$configs['fb_permissions']}");
+}
+function validateSession(){
+    if(empty($_SESSION)){
+        echo "Missing required Facebook Session <br />";
+        die();
+    }
+}
+function validatePageIds(){
+    if(empty($_SESSION['fb_page_details'])){
+        echo "Missing required Page Details <br />";
+        die();
+    }
 }
 function makeApiReq($type="get",$uri, $fields=""){
     global $configs;
@@ -57,20 +69,35 @@ function getPageAccessTokens(){
 
     return $_SESSION['fb_page_details'];
 }
+function storePagePhoto($page_id, $photoData){
+    $response = makeApiReq(
+        "post",
+        "https://graph.facebook.com/{$page_id}/photos",
+        http_build_query($photoData)
+    );
+
+    if (!isset($response["id"])) {
+        echo "Error uploading image to Facebook Page";
+    } else {
+        echo "Image uploaded to Facebook Page";
+    }
+
+    printVars($response);
+}
 function createPost($page_id, $data){
     $response = makeApiReq(
         "post",
         "https://graph.facebook.com/{$page_id}/feed",
-        $data
+        http_build_query($data)
     );
 
     // Check for errors
-    if ($response === false) {
+    if (!isset($response['id'])) {
         echo "Error posting message to Facebook Page";
     } else {
         echo "Message posted to Facebook Page";
-        var_dump($response);
+
     }
 
-    return $response;
+    printVars($response);
 }
