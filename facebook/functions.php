@@ -72,7 +72,7 @@ function getPageAccessTokens(){
 function storePagePhoto($page_id, $photoData){
     $response = makeApiReq(
         "post",
-        "https://graph.facebook.com/{$page_id}/photos",
+        "{$page_id}/photos",
         http_build_query($photoData)
     );
 
@@ -100,4 +100,25 @@ function createPost($page_id, $data){
     }
 
     printVars($response);
+}
+
+function fetchPagePostIds($page_id, $access_token){
+    $response = makeApiReq(
+        "get",
+        "{$page_id}/posts?access_token={$access_token}",
+        ""
+    );
+
+    if (!isset($response["data"])) {
+        echo "Error retrieving post IDs from Facebook Page";
+        printVars($response);
+
+    } else {
+        $post_ids = array();
+        foreach ($response["data"] as $post) {
+            $post_ids[] = $post["id"];
+        }
+        echo "Retrieved post IDs from Facebook Page: ";
+        printVars($post_ids);
+    }
 }
