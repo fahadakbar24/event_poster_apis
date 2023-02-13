@@ -4,9 +4,7 @@ session_start();
 include("functions.php");
 
 validatePageIds();
+validatePostId();
 
-$pageInfo = array_filter($_SESSION['fb_page_details']['data'], function ($curPageInfo) {
-    return $curPageInfo['name'] == $_GET['name'];
-})[0];
-
+$pageInfo = getPageInfo($_GET['name']);
 deletePagePosts($_GET['post_id'], $pageInfo['access_token']);

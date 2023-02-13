@@ -4,16 +4,13 @@ include("functions.php");
 
 validatePageIds();
 
-$pageInfo = array_filter($_SESSION['fb_page_details']['data'], function ($curPageInfo){
-    return $curPageInfo['name'] == $_GET['name'];
-})[0];
+$pageInfo = getPageInfo($_GET['name']);;
 
-
-$photosData = array(
-    "access_token" => $pageInfo['access_token'],
-    "message" => "Description of the image",
-    "source" => curl_file_create("../uploads/2.jpg"),
-);
+//$photosData = array(
+//    "access_token" => $pageInfo['access_token'],
+//    "message" => "Description of the image",
+//    "source" => curl_file_create("../uploads/2.jpg"),
+//);
 
 $postData = array(
     "message" => "Hello World",

@@ -26,6 +26,11 @@ function validatePageIds(){
         die();
     }
 }
+function validatePostId(){
+    if(!isset($_GET['post_id'])){
+        die("No post Id given");
+    }
+}
 function makeApiReq($type="get",$uri, $fields=""){
     global $configs;
 
@@ -69,6 +74,12 @@ function getPageAccessTokens(){
 
     return $_SESSION['fb_page_details'];
 }
+function getPageInfo($pageName){
+    return array_filter($_SESSION['fb_page_details']['data'], function ($curPageInfo) {
+        return $curPageInfo['name'] == $_GET['name'];
+    })[0];
+
+}
 function storePagePhoto($page_id, $photoData){
     $response = makeApiReq(
         "post",
@@ -85,23 +96,28 @@ function storePagePhoto($page_id, $photoData){
     printVars($response);
 }
 function createPost($page_id, $data){
-    $response = makeApiReq(
-        "post",
-        "https://graph.facebook.com/{$page_id}/feed",
-        http_build_query($data)
-    );
+    $response = makeApiReq("post","{$page_id}/feed",http_build_query($data));
 
     // Check for errors
     if (!isset($response['id'])) {
         echo "Error posting message to Facebook Page";
     } else {
         echo "Message posted to Facebook Page";
-
     }
 
     printVars($response);
 }
+function editPost($post_id, $newData){
+    $response = makeApiReq("post", "{$post_id}", http_build_query($newData));
 
+    if (!isset($response["id"])) {
+        echo "Error editing post on Facebook Page";
+    } else {
+        echo "Edited post on Facebook Page";
+    }
+
+    printVars($response);
+}
 function fetchPagePostIds($page_id, $access_token){
     $response = makeApiReq(
         "get",
@@ -122,7 +138,6 @@ function fetchPagePostIds($page_id, $access_token){
         printVars($post_ids);
     }
 }
-
 function deletePagePosts($post_id, $access_token){
     $response = makeApiReq(
         "get",
