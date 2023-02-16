@@ -1,39 +1,40 @@
 <?php
+session_start();
+include("functions.php");
 
-$event_name = "Example Event";
-$event_start = "2023-03-01T10:00:00Z";
-$event_end = "2023-03-01T12:00:00Z";
-$event_currency = "USD";
-$event_capacity = 100;
+$dateFormat = "Y-m-d\TH:i:s\Z";
+$today = date($dateFormat);
 
-$data = array(
-    "event.name.html" => $event_name,
-    "event.start.utc" => $event_start,
-    "event.end.utc" => $event_end,
-    "event.currency" => $event_currency,
-    "event.capacity" => $event_capacity
-);
+$eventData = [
+    "event" => [
+        "name" => [ "html" => "Example Event" ],
+        "description" => [ "html" => "Some text" ],
+        "start" => [
+            "timezone" => "UTC",
+            "utc" => date($dateFormat, strtotime($today. ' + 2 days'))
+        ],
+        "end" => [
+            "timezone" => "UTC",
+            "utc" => date($dateFormat, strtotime($today. ' + 5 days'))
+        ],
+        "currency" => "USD",
+        "capacity" => 100,
+        "is_series"=>true,
+        "currency" => "USD",
+        "online_event" => false,
+        "organizer_id" => "",
+        "listed" => false,
+        "shareable" => false,
+        "invite_only" => false,
+        "show_remaining" => true,
+        "password" => "12345",
+        "capacity" => 100,
+        "is_reserved_seating" => true,
+        "show_pick_a_seat" => true,
+        "show_seatmap_thumbnail" => true,
+        "show_colors_in_seatmap_thumbnail" => true,
+        "locale" => "de_AT"
+    ]
+];
 
-$headers = array(
-    "Authorization: Bearer {OAuth token}",
-    "Content-Type: application/json"
-);
-
-$ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, "https://www.eventbriteapi.com/v3/events/");
-curl_setopt($ch, CURLOPT_POST, true);
-curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-$response = curl_exec($ch);
-curl_close($ch);
-
-// Check for errors
-$data = json_decode($response, true);
-if (!isset($data["id"])) {
-    echo "Error creating event on Eventbrite";
-} else {
-    echo "Created event on Eventbrite";
-}
-
-?>
+createEvent($eventData);
