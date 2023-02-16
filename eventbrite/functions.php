@@ -1,5 +1,6 @@
 <?php
 $configs = include("../config.php");
+include("../globalfunctions.php");
 
 function redirectToEBLogin(){
     global $configs;
@@ -9,23 +10,59 @@ function redirectToEBLogin(){
 }
 
 function makeEBApiReq($type="get",$uri, $fields="", $headers=[]){
-    return makeApiReq($type,"https://www.eventbrite.com/{$uri}", $fields, $headers);
+    global $configs;
+    $headers[] = "Authorization: Bearer {$_SESSION['eb_access_token_details']['access_token']}";
+    return makeApiReq($type,"https://www.eventbriteapi.com/{$configs['eb_api_ver']}/{$uri}", $fields, $headers);
 }
 
 function getPrivateToken($data){
-    $response = makeEBApiReq(
+    $response = makeApiReq(
         "post",
-        "oauth/token",
+        "https://www.eventbrite.com/oauth/token",
         http_build_query($data),
-        array( "content-type: application/x-www-form-urlencoded" )
+        ["content-type: application/x-www-form-urlencoded"]
     );
 
     if (!isset($response["access_token"])) {
         echo "Error obtaining access token";
     } else {
-         $_SESSION['eb_access_token_details'] = $response;
+        $_SESSION['eb_access_token_details'] = $response;
         echo "Access token: ";
     }
 
     printVars($response);
 }
+
+function setOrgIds(){
+    $response = makeEBApiReq("get","users/me/organizations/","",[]);
+
+    if (!isset($response["organizations"])) {
+        echo "Error obtaining organization ID";
+    } else {
+        $_SESSION['eb_org_details'] = $response["organizations"];
+        echo "User ID: ";
+    }
+
+    printVars($response);
+}
+
+function createEvent($evtData){
+    $headers = ["Content-Type: application/json"];
+
+    $response = makeEBApiReq(
+        "post",
+        "organizations/{$_SESSION['eb_org_details'][0]['id']}/events/",
+        json_encode($evtData),
+        $headers
+    );
+
+    if (!isset($response["id"])) {
+        echo "Error creating event on Eventbrite";
+    } else {
+        echo "Created event on Eventbrite: ";
+    }
+
+    printVars($response);
+}
+
+function createEventSchedule($evtId, $schedule){}

@@ -1,6 +1,7 @@
 <?php
 
-function printVars($var){
+function printVars($var, $message=""){
+    echo $message;
     echo "<pre>";
     print_r($var);
     echo "<pre/><br/><br/>";

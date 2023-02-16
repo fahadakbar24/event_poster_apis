@@ -1,12 +1,11 @@
 <?php
 session_start();
-include('../globalfunctions.php');
 include('functions.php');
 
 $configs = include('../config.php');
 
 if(!isset($_GET['refresh']) && isset($_SESSION['eb_access_token_details'])){
-    print_r($_SESSION['eb_access_token_details']);
+    printVars($_SESSION);
 }
 else if (isset($_GET['code'])) {// Check if the user is coming back from the authentication process
     $appAccessData = array(
@@ -17,8 +16,9 @@ else if (isset($_GET['code'])) {// Check if the user is coming back from the aut
         "redirect_uri" => $configs['eb_redirect_uri'],
     );
 
-    printVars($_GET['code']);
+    printVars($_GET['code'], "Auth token:");
     getPrivateToken($appAccessData);
+    setOrgIds();
 } else { redirectToEBLogin(); }
 
 
