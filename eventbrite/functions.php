@@ -66,3 +66,20 @@ function createEvent($evtData){
 }
 
 function createEventSchedule($evtId, $schedule){}
+
+function deleteEvent($event_id){
+    $response  = makeEBApiReq(
+        "delete",
+        "events/$event_id/",
+        "",
+        ["Content-Type: application/json"]
+    );
+
+    if (isset($response["error_description"])) {
+        echo "Error deleting event: ";
+    } else {
+        echo "Event ($event_id) deleted successfully";
+    }
+
+    printVars($response);
+}

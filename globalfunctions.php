@@ -12,7 +12,13 @@ function makeApiReq($method = "get",$uri, $payload = "", $headers = []){
 
     curl_setopt($ch, CURLOPT_URL, $uri);
     curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
-    curl_setopt($ch, CURLOPT_POST, $method == "post");
+
+    if($method == "delete"){
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "DELETE");
+    } else {
+        curl_setopt($ch, CURLOPT_POST, $method == "post");
+    }
+
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
