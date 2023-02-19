@@ -67,6 +67,24 @@ function createEvent($evtData){
 
 function createEventSchedule($evtId, $schedule){}
 
+function fetchAllOrgEvents(){
+    $response = makeEBApiReq(
+        "get",
+        "/organizations/{$_SESSION['eb_org_details'][0]['id']}/events/",
+        "",
+        []
+    );
+
+    if (!isset($response["events"])) {
+        echo "Error retrieving events";
+    } else {
+        echo "Events are: ";
+
+    }
+
+    printVars($response);
+}
+
 function deleteEvent($event_id){
     $response  = makeEBApiReq(
         "delete",
