@@ -12,6 +12,9 @@ function redirectToEBLogin(){
 function makeEBApiReq($type="get",$uri, $fields="", $headers=[]){
     global $configs;
     $headers[] = "Authorization: Bearer {$_SESSION['eb_access_token_details']['access_token']}";
+    if(isset($fields)){
+        $headers[] = "Content-Type: application/json";
+    }
     return makeApiReq($type,"https://www.eventbriteapi.com/{$configs['eb_api_ver']}/{$uri}", $fields, $headers);
 }
 
@@ -20,7 +23,7 @@ function getPrivateToken($data){
         "post",
         "https://www.eventbrite.com/oauth/token",
         http_build_query($data),
-        ["content-type: application/x-www-form-urlencoded"]
+        []
     );
 
     if (!isset($response["access_token"])) {
@@ -47,13 +50,11 @@ function setOrgIds(){
 }
 
 function createEvent($evtData){
-    $headers = ["Content-Type: application/json"];
-
     $response = makeEBApiReq(
         "post",
         "organizations/{$_SESSION['eb_org_details'][0]['id']}/events/",
         json_encode($evtData),
-        $headers
+        []
     );
 
     if (!isset($response["id"])) {
@@ -63,6 +64,24 @@ function createEvent($evtData){
     }
 
     printVars($response);
+    return $response;
+}
+
+function createTickets($evtId, $ticketData){
+    $response = makeEBApiReq(
+        "post",
+        "/events/$evtId/ticket_classes/",
+        json_encode($ticketData)
+    );
+
+    if(!isset($response['id'])){
+        echo "Error creating ticket";
+    } else {
+        echo "Ticket added successfully. \n";
+    }
+
+    printVars($response);
+    return $response;
 }
 
 function createEventSchedule($evtId, $schedule){}
@@ -83,6 +102,7 @@ function fetchAllOrgEvents(){
     }
 
     printVars($response);
+    return isset($response["events"]) ? $response["events"] : [];
 }
 
 function deleteEvent($event_id){

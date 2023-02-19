@@ -23,6 +23,12 @@ function makeApiReq($method = "get",$uri, $payload = "", $headers = []){
     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
     $response = curl_exec($ch);
+
+    if ($response === false) {
+        $error = curl_error($ch);
+        echo "cURL Error: $error";
+    }
+
     curl_close($ch);
 
     return json_decode($response, true);
