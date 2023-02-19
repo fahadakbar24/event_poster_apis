@@ -3,7 +3,7 @@ $configs = include("../config.php");
 include("../globalfunctions.php");
 
 function verifyUpdateParams(){
-    if(!isset($_GET["event_id"])){
+    if(!isset($_GET["event_id"]) || empty($_GET["event_id"])){
         die("No Event Id specified.");
     }
 }
