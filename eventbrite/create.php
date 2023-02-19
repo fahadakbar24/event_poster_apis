@@ -28,7 +28,6 @@ $eventData = [
         "invite_only" => false,
         "show_remaining" => true,
 //        "password" => "12345",
-        "capacity" => 100,
         "is_reserved_seating" => false,
         "show_pick_a_seat" => true,
         "show_seatmap_thumbnail" => true,
@@ -49,3 +48,4 @@ $ticketData = [
 
 $eventDetails = createEvent($eventData);
 createTickets($eventDetails["id"], $ticketData);
+publishEvent($eventDetails["id"]);

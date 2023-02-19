@@ -2,6 +2,12 @@
 $configs = include("../config.php");
 include("../globalfunctions.php");
 
+function verifyUpdateParams(){
+    if(!isset($_GET["event_id"])){
+        die("No Event Id specified.");
+    }
+}
+
 function redirectToEBLogin(){
     global $configs;
 
@@ -82,6 +88,72 @@ function createTickets($evtId, $ticketData){
 
     printVars($response);
     return $response;
+}
+
+function fetchTickets($evtId){
+    $response = makeEBApiReq(
+        "get",
+        "events/{$evtId}/ticket_classes/",
+
+    );
+
+//    if(!$response['ticket_classes']){
+//        echo "error fetching tickets";
+//    } else {
+//        echo "Tickets fetched successfully";
+//    }
+
+//    printVars($response);
+    return $response;
+}
+
+function updateTickets($evtId, $ticketData){
+    $allTickets = fetchTickets($evtId);
+
+    $response = makeEBApiReq(
+        "post",
+        "/events/$evtId/ticket_classes/{$allTickets['ticket_classes'][0]['id']}/",
+        json_encode($ticketData),
+        []
+    );
+
+    if(!isset($response['id'])){
+        echo "Error updating ticket";
+    } else {
+        echo "Ticket updated successfully. \n";
+    }
+
+    printVars($response);
+    return $response;
+}
+
+function updateEvent($evtId, $evtData){
+    $response = makeEBApiReq(
+        "post",
+        "events/{$evtId}/",
+        json_encode($evtData),
+        []
+    );
+
+    if (!$response["id"]) {
+
+    } else {
+        echo "Event updated successfully";
+    }
+
+    printVars($response);
+    return $response;
+}
+
+function publishEvent($evtId, $allowPublish = true){
+    $response = makeEBApiReq(
+        "post",
+        "events/{$evtId}/". ($allowPublish?'':'un') ."publish/",
+        "",
+        []
+    );
+
+    printVars($response);
 }
 
 function createEventSchedule($evtId, $schedule){}
