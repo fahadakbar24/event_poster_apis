@@ -2,15 +2,14 @@
 $configs = include("../config.php");
 include("../globalfunctions.php");
 
-function makeMUApiReq($type="get", $query="", $headers=[]){
-    global $configs;
-
+function makeMUApiReq($type="get", $query="", $variables=[], $headers=[]){
     $headers[] = "Authorization: Bearer {$_SESSION['mu_access_token_details']['access_token']}";
     if(isset($fields)){
         $headers[] = "Content-Type: application/json";
     }
 
-    return makeApiReq($type,"https://api.meetup.com/gql", json_encode(['query' => $query,]), $headers);
+    return makeApiReq($type,"https://api.meetup.com/gql",
+        json_encode(['query' => $query, 'variables'=>$variables]), $headers);
 }
 
 function redirectToMULogin(){
@@ -75,7 +74,7 @@ function getNetworkNGroupInfos(){
         }
     GRAPHQL;
 
-    $response = makeMUApiReq("post",  $query, []);
+    $response = makeMUApiReq("post",  $query);
 
 
     if(!isset($response['data'])){
@@ -88,4 +87,22 @@ function getNetworkNGroupInfos(){
 
     printVars($response);
     return $response;
+}
+
+function createEvent($evtData){
+    $query = <<<QUERY
+    mutation CreateEvent(\$input: CreateEventInput!) {
+      createEvent(input: \$input) {
+        event {
+          id
+          title
+        }
+      }
+    }
+    QUERY;
+
+    $response = makeMUApiReq("post", $query, [ 'input' => $evtData ]);
+
+
+    printVars( $response );
 }
