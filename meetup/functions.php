@@ -96,13 +96,48 @@ function createEvent($evtData){
         event {
           id
           title
+          status
+          description
+          dateTime
+          duration
         }
       }
     }
     QUERY;
 
     $response = makeMUApiReq("post", $query, [ 'input' => $evtData ]);
-
-
     printVars( $response );
+}
+
+function fetchEvents($groupId){
+    $query = <<<GRAPHQL
+    {
+      group(id: "$groupId") {
+        id
+        unifiedEvents {
+          count
+          edges {
+            node {
+              id
+              title
+              status
+              description
+              dateTime
+              duration
+            }
+          }
+        }
+      }
+    }
+    GRAPHQL;
+
+//    die($query);
+
+    $response = makeMUApiReq("post", $query, ['groupId' => $groupId]);
+    printVars(['groupId' => $groupId]);
+    if(isset($response['data']['group']['unifiedEvents'])){
+        $response = $response['data']['group']['unifiedEvents'];
+    }
+    printVars($response);
+    return $response;
 }
