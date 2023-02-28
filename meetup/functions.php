@@ -2,15 +2,15 @@
 $configs = include("../config.php");
 include("../globalfunctions.php");
 
-function makeMUApiReq($type="get",$uri, $fields="", $headers=[]){
+function makeMUApiReq($type="get", $query="", $headers=[]){
     global $configs;
 
-    $headers[] = "Authorization: Bearer {$_SESSION['eb_access_token_details']['access_token']}";
+    $headers[] = "Authorization: Bearer {$_SESSION['mu_access_token_details']['access_token']}";
     if(isset($fields)){
         $headers[] = "Content-Type: application/json";
     }
 
-    return makeApiReq($type,"https://api.meetup.com/graphql/{$uri}", $fields, $headers);
+    return makeApiReq($type,"https://api.meetup.com/gql", json_encode(['query' => $query,]), $headers);
 }
 
 function redirectToMULogin(){
@@ -18,8 +18,6 @@ function redirectToMULogin(){
     session_unset();
 
     $authorization_url = "https://secure.meetup.com/oauth2/authorize?client_id={$configs['mu_api_key']}&response_type=code&redirect_uri={$configs['mu_redirect_uri']}";
-
-
     header("Location: " . $authorization_url);
 }
 
@@ -44,6 +42,48 @@ function getAccessToken($AuthCode){
     } else {
         $_SESSION['mu_access_token_details'] = $response;
         echo "Access token: ";
+    }
+
+    printVars($response);
+    return $response;
+}
+
+function getNetworkNGroupInfos(){
+    $query = <<<GRAPHQL
+       query {
+          self {
+            adminProNetworks {
+              id
+              name
+              urlname
+            }
+            memberships {
+              pageInfo {
+                hasNextPage
+              }
+              edges {
+                node {
+                  id
+                  name
+                  status
+                  urlname
+                  link
+                }
+              }
+            }
+          }
+        }
+    GRAPHQL;
+
+    $response = makeMUApiReq("post",  $query, []);
+
+
+    if(!isset($response['data'])){
+        echo 'Error: ';
+    }else{
+        echo 'Successfully fetched the groups info';
+        $_SESSION['mu_groups_details'] = $response['data']['self']['memberships']['edges'];
+        $_SESSION['mu_network_details'] = $response['data']['self']['adminProNetworks'];
     }
 
     printVars($response);

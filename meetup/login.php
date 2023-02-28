@@ -9,7 +9,7 @@ if(!isset($_GET['refresh']) && isset($_SESSION['mu_access_token_details'])){
 }
 else if (isset($_GET['code'])) {
     getAccessToken($_GET["code"]);
-} else { redirectToMULogin(); }
-
-
-
+    getNetworkNGroupInfos();
+} else {
+    redirectToMULogin();
+}
