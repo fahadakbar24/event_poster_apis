@@ -131,8 +131,6 @@ function fetchEvents($groupId){
     }
     GRAPHQL;
 
-//    die($query);
-
     $response = makeMUApiReq("post", $query, ['groupId' => $groupId]);
     printVars(['groupId' => $groupId]);
     if(isset($response['data']['group']['unifiedEvents'])){
@@ -140,4 +138,35 @@ function fetchEvents($groupId){
     }
     printVars($response);
     return $response;
+}
+function deleteEvent($eventId){
+    $query = <<<GRAPHQL
+        mutation(\$input: DeleteEventInput!) {
+            deleteEvent(input: \$input) {
+                success
+                errors {
+                        message
+                  code
+                  field
+                }
+            }
+        }
+    GRAPHQL;
+
+    $response = makeMUApiReq("post", $query, [ "input" => [ "eventId" => "$eventId"]]);
+
+    if(isset($data['errors'])) {
+        echo "Error: " . $data['errors'][0]['message'];
+    } else {
+        echo "Event deleted successfully.";
+    }
+
+    printVars($response);
+    return $response;
+}
+function deleteAllEvents(){
+    $eventDetails = fetchEvents($_SESSION['mu_groups_details'][0]['node']['id']);
+    foreach ($eventDetails['edges'] as $event){
+        deleteEvent($event['node']['id']);
+    }
 }
