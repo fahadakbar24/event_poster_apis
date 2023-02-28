@@ -170,3 +170,31 @@ function deleteAllEvents(){
         deleteEvent($event['node']['id']);
     }
 }
+
+function updateEvent($newEventData){
+    $query = <<<'QUERY'
+        mutation updateEvent($input: EditEventInput!) {
+            editEvent(input: $input) {
+                event {
+                    id
+                    title
+                    description
+                    dateTime
+                    duration 
+                }
+            }
+        }
+    QUERY;
+
+    $response = makeMUApiReq("post", $query, ['input' => $newEventData, ]);
+
+    // Check for errors
+    if (isset($response['errors'])) {
+        echo 'Error updating event:' ;
+    } else {
+        echo 'Event updated: ' ;
+    }
+
+    printVars($response);
+    return $response;
+}
