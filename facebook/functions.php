@@ -28,7 +28,7 @@ function validatePostId(){
 
 function makeFBApiReq($type="get",$uri, $fields=""){
     global $configs;
-    makeApiReq($type,"https://graph.facebook.com/{$configs['fb_api_ver']}/{$uri}", $fields="");
+    return makeApiReq($type,"https://graph.facebook.com/{$configs['fb_api_ver']}/{$uri}", $fields);
 }
 
 function getShortAccessToken($code) {
@@ -37,7 +37,12 @@ function getShortAccessToken($code) {
     return makeFBApiReq(
         "post",
         "oauth/access_token",
-        "client_id={$configs['fb_app_id']}&redirect_uri={$configs['fb_redirect_uri']}&client_secret={$configs['fb_app_secret']}&code={$code}"
+        http_build_query([
+            "client_id" => $configs['fb_app_id'],
+            "redirect_uri" => $configs['fb_redirect_uri'],
+            "client_secret" => $configs['fb_app_secret'],
+            "code" => $code
+        ])
     );
 }
 function getLongAccessToken($shortAccessToken){
