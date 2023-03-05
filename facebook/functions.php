@@ -26,9 +26,9 @@ function validatePostId(){
     }
 }
 
-function makeFBApiReq($type="get",$uri, $fields=""){
+function makeFBApiReq($type="get",$uri, $fields="", $headers=[]){
     global $configs;
-    return makeApiReq($type,"https://graph.facebook.com/{$configs['fb_api_ver']}/{$uri}", $fields);
+    return makeApiReq($type,"https://graph.facebook.com/{$configs['fb_api_ver']}/{$uri}", $fields, $headers);
 }
 
 function getShortAccessToken($code) {
@@ -71,11 +71,7 @@ function getPageInfo($pageName){
 
 }
 function storePagePhoto($page_id, $photoData){
-    $response = makeFBApiReq(
-        "post",
-        "{$page_id}/photos",
-        http_build_query($photoData)
-    );
+    $response = makeFBApiReq( "post", "{$page_id}/photos", $photoData);
 
     if (!isset($response["id"])) {
         echo "Error uploading image to Facebook Page";
@@ -84,9 +80,15 @@ function storePagePhoto($page_id, $photoData){
     }
 
     printVars($response);
+    return $response;
 }
 function createPost($page_id, $data){
-    $response = makeFBApiReq("post","{$page_id}/feed",http_build_query($data));
+    $response = makeFBApiReq(
+        "post",
+        "{$page_id}/feed",
+        http_build_query($data),
+//        ["Content-Type: multipart/form-data"]
+    );
 
     // Check for errors
     if (!isset($response['id'])) {
@@ -127,6 +129,7 @@ function fetchPagePostIds($page_id, $access_token){
         echo "Retrieved post IDs from Facebook Page: ";
         printVars($post_ids);
     }
+    return $post_ids;
 }
 function deletePagePosts($post_id, $access_token){
     $response = makeFBApiReq(
@@ -136,9 +139,9 @@ function deletePagePosts($post_id, $access_token){
     );
 
     if (!isset($response["success"])) {
-        echo "Error deleting post from Facebook Page";
+        echo "Error deleting post from Facebook Page\n";
         printVars($response);
     } else {
-        echo "Deleted post from Facebook Page";
+        echo "Deleted post from Facebook Page\n";
     }
 }
