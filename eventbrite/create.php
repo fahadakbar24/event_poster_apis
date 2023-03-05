@@ -4,6 +4,11 @@ include("functions.php");
 
 $dateFormat = "Y-m-d\TH:i:s\Z";
 $today = date($dateFormat);
+$stardDate = date($dateFormat, strtotime($today. ' + 0 days'));
+$endDate = date($dateFormat, strtotime($today. ' + 12 hours'));
+//uploadImage();
+//die();
+
 
 $eventData = [
     "event" => [
@@ -11,20 +16,20 @@ $eventData = [
         "description" => [ "html" => "Some text" ],
         "start" => [
             "timezone" => "UTC",
-            "utc" => date($dateFormat, strtotime($today. ' + 2 days'))
+            "utc" => $stardDate
         ],
         "end" => [
             "timezone" => "UTC",
-            "utc" => date($dateFormat, strtotime($today. ' + 5 days'))
+            "utc" => $endDate
         ],
         "currency" => "USD",
         "capacity" => 100,
-        "is_series"=>false,
+        "is_series"=>true,
         "currency" => "USD",
         "online_event" => false,
         "organizer_id" => "",
         "listed" => true,
-        "shareable" => false,
+        "shareable" => true,
         "invite_only" => false,
         "show_remaining" => true,
 //        "password" => "12345",
@@ -33,6 +38,8 @@ $eventData = [
         "show_seatmap_thumbnail" => true,
         "show_colors_in_seatmap_thumbnail" => true,
         "locale" => "en_US",
+//        "logo" => new CURLFile("../uploads/2.jpg"),
+        "logo_id" => '',
     ]
 ];
 
@@ -41,11 +48,20 @@ $ticketData = [
         "name" => "Ticket Type 1",
         "quantity_total" => 50,
         "cost" => "USD:25",
-        "sales_start" => date($dateFormat, strtotime($today)),
-        "sales_end" =>  date($dateFormat, strtotime($today. ' + 5 days')),
+        "sales_start" => !$eventData['event']['is_series'] ? date($dateFormat, strtotime($today. ' - 1 days')): "",
+        "sales_end" =>  !$eventData['event']['is_series'] ? date($dateFormat, strtotime($today. ' + 10 hours')): "",
+    ]
+];
+
+$scheduleData = [
+    "schedule" => [
+        "occurrence_duration" => 3600,
+        "recurrence_rule" => "DTSTART:20230305T023000Z
+RRULE:FREQ=MONTHLY;BYDAY=1WE;COUNT=5"
     ]
 ];
 
 $eventDetails = createEvent($eventData);
+scheduleEvent($eventDetails["series_id"], $scheduleData);
 createTickets($eventDetails["id"], $ticketData);
 publishEvent($eventDetails["id"]);

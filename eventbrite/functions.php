@@ -55,12 +55,83 @@ function setOrgIds(){
     printVars($response);
 }
 
+function uploadImage(){
+//    $imgPath = '../uploads/2.jpg';
+//    $response = makeEBApiReq(
+//        "post",
+//        "media/upload/",
+//        array(
+//            'upload_token' => $_SESSION['eb_access_token_details']['access_token'],
+//            'image_file' => new CURLFILE($imgPath, mime_content_type($imgPath), basename($imgPath)),
+//        ),
+//        [
+//            'Content-Type: application/octet-stream',
+//            'Content-Disposition: form-data; name="upload"; filename="' . basename($imgPath) . '"'
+//        ]
+//    );
+//
+//    printVars($response);
+
+    // Image details
+    $imagePath = "../uploads/2.jpg";
+    $imageType = mime_content_type($imagePath);
+
+    // Get the upload URL for the image
+    $ch = curl_init("https://www.eventbriteapi.com/v3/media/upload/?type=image-event-logo&token={$_SESSION['eb_access_token_details']['access_token']}");
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array("Authorization: Bearer {$_SESSION['eb_access_token_details']['access_token']}"));
+    $result = curl_exec($ch);
+    $uploadReqs = json_decode($result, true);
+    curl_close($ch);
+
+    printVars($uploadReqs);
+
+    if (!isset($uploadReqs['upload_url'])) {
+        die("Failed to get upload URL.");
+    }
+
+    // Upload the image
+    $ch = curl_init($uploadReqs['upload_url']);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+//        "Authorization: Bearer {$_SESSION['eb_access_token_details']['access_token']}",
+//        "Authorization: Bearer {$uploadReqs['upload_token']}",
+        "Content-Type: multipart/form-data",
+//        "Content-Type: $imageType",
+//        "Content-Length: " . filesize($imagePath)
+    ));
+
+//    $uploadReqs['upload_data']['upload_token'] = $uploadReqs['upload_token'];
+//    $uploadReqs['upload_data']['file'] = curl_file_create($imagePath);
+
+//    printVars($uploadReqs['upload_data']);
+    curl_setopt($ch, CURLOPT_POSTFIELDS,array_merge(
+        $uploadReqs['upload_data'],
+        [
+            'file' => curl_file_create($imagePath),
+            'upload_token' => $uploadReqs['upload_token']
+        ]
+    ));
+    $result = curl_exec($ch);
+    $response = json_decode($result, true);
+
+
+    printVars($result);
+    if (!isset($response['id'])) {
+        die("Failed to upload image.".curl_error($ch));
+    }
+    curl_close($ch);
+    $imageId = $response['id'];
+
+printVars($response);
+}
+
 function createEvent($evtData){
     $response = makeEBApiReq(
         "post",
         "organizations/{$_SESSION['eb_org_details'][0]['id']}/events/",
         json_encode($evtData),
-        []
     );
 
     if (!isset($response["id"])) {
@@ -71,6 +142,28 @@ function createEvent($evtData){
 
     printVars($response);
     return $response;
+}
+function scheduleEvent($eventId, $scheduleData){
+    $ch = curl_init();
+
+    curl_setopt($ch, CURLOPT_URL, "https://www.eventbriteapi.com/v3/events/{$eventId}/schedules/");
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+    curl_setopt($ch, CURLOPT_HEADER, FALSE);
+
+    curl_setopt($ch, CURLOPT_POST, TRUE);
+
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($scheduleData));
+
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+        "Authorization: Bearer {$_SESSION['eb_access_token_details']['access_token']}",
+        "Content-Type: application/json"
+    ));
+
+    $response = curl_exec($ch);
+    curl_close($ch);
+
+    var_dump($response);
+
 }
 
 function createTickets($evtId, $ticketData){
