@@ -4,7 +4,16 @@ session_start();
 include("functions.php");
 
 validatePageIds();
-validatePostId();
-
 $pageInfo = getPageInfo($_GET['name']);
-deletePagePosts($_GET['post_id'], $pageInfo['access_token']);
+
+if(!empty($_GET['refresh'])){
+    $pagePostIds = fetchPagePostIds($pageInfo['id'], $pageInfo['access_token']);
+
+    foreach ($pagePostIds as $postId){
+        deletePagePosts($postId, $pageInfo['access_token']);
+    }
+}else{
+    validatePostId();
+    deletePagePosts($_GET['post_id'], $pageInfo['access_token']);
+}
+
