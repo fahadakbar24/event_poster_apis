@@ -1,12 +1,16 @@
 <?php
 
 function printVars($var, $message=""){
-    echo $message;
+    echo "<br/>$message<br/>";
     echo "<pre>";
-    print_r($var);
-    echo "<pre/><br/><br/>";
+        print_r($var);
+    echo "<pre/><br/>";
 }
 
+function printError($msg, $errorInfoObj=[]){
+    printVars($errorInfoObj, $msg);
+    die();
+}
 function makeApiReq($method = "get",$uri, $payload = "", $headers = []){
     $ch = curl_init();
 

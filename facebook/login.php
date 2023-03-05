@@ -18,5 +18,10 @@ else if (isset($_GET['code'])) {// Check if the user is coming back from the aut
 
         $_SESSION['fb_access_token_details'] = $longAccessTokenResp;
         printVars($_SESSION['fb_access_token_details']);
+
+        if(!empty($longAccessTokenResp['access_token'])){
+            $pageAccessTokens = getPageAccessTokens();
+            printVars($pageAccessTokens);
+        }
     }
 } else { redirectToFBLogin(); }

@@ -16,13 +16,12 @@ function validateSession(){
 }
 function validatePageIds(){
     if(empty($_SESSION['fb_page_details'])){
-        echo "Missing required Page Details <br />";
-        die();
+        printError("Missing required Page Details");
     }
 }
-function validatePostId(){
-    if(!isset($_GET['post_id'])){
-        die("No post Id given");
+function validatePageParams(){
+    if(empty($_GET['post_id'])){
+        printError("Missing required Page Details");
     }
 }
 
@@ -74,12 +73,9 @@ function storePagePhoto($page_id, $photoData){
     $response = makeFBApiReq( "post", "{$page_id}/photos", $photoData);
 
     if (!isset($response["id"])) {
-        echo "Error uploading image to Facebook Page";
-    } else {
-        echo "Image uploaded to Facebook Page";
+        printError( "Error uploading image to Facebook Page", $response);
     }
 
-    printVars($response);
     return $response;
 }
 function createPost($page_id, $data){
@@ -87,28 +83,22 @@ function createPost($page_id, $data){
         "post",
         "{$page_id}/feed",
         http_build_query($data),
-//        ["Content-Type: multipart/form-data"]
     );
 
-    // Check for errors
     if (!isset($response['id'])) {
-        echo "Error posting message to Facebook Page";
-    } else {
-        echo "Message posted to Facebook Page";
+        printError("Error posting message to Facebook Page", $response);
     }
 
-    printVars($response);
+    return $response;
 }
 function editPost($post_id, $newData){
     $response = makeFBApiReq("post", "{$post_id}", http_build_query($newData));
 
-    if (!isset($response["id"])) {
-        echo "Error editing post on Facebook Page";
-    } else {
-        echo "Edited post on Facebook Page";
+    if (!isset($response["success"])) {
+        printError("Error editing post on Facebook Page", $response);
     }
 
-    printVars($response);
+    return $response;
 }
 function fetchPagePostIds($page_id, $access_token){
     $response = makeFBApiReq(
@@ -118,9 +108,7 @@ function fetchPagePostIds($page_id, $access_token){
     );
 
     if (!isset($response["data"])) {
-        echo "Error retrieving post IDs from Facebook Page";
-        printVars($response);
-
+        printError( "Error retrieving post IDs from Facebook Page", $response);
     } else {
         $post_ids = array();
         foreach ($response["data"] as $post) {

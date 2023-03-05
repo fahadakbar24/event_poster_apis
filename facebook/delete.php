@@ -13,7 +13,7 @@ if(!empty($_GET['refresh'])){
         deletePagePosts($postId, $pageInfo['access_token']);
     }
 }else{
-    validatePostId();
+    validatePageParams();
     deletePagePosts($_GET['post_id'], $pageInfo['access_token']);
 }
 
