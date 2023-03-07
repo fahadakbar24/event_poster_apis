@@ -8,6 +8,8 @@ $event_id = $_GET['event_id'];
 
 $dateFormat = "Y-m-d\TH:i:s\Z";
 $today = date($dateFormat);
+$startDate = date($dateFormat, strtotime($today. ' + 6 days'));
+$endDate = date($dateFormat, strtotime($today. ' + 8 days'));
 
 $newEventData = [
     "event" => [
@@ -41,15 +43,8 @@ RRULE:FREQ=MONTHLY;BYDAY=1WE;COUNT=7"
 $details["old"] = fetchEvent($event_id);
 
 if(empty($details["old"]["is_series"])){
-    $eventData["start"] = [
-        "timezone" => "UTC",
-        "utc" => date($dateFormat, strtotime($today. ' + 6 days'))
-    ];
-
-    $eventData["end"] = [
-        "timezone" => "UTC",
-        "utc" => date($dateFormat, strtotime($today. ' + 8 days'))
-    ];
+    $eventData["start"] = [ "timezone" => "UTC", "utc" => $startDate ];
+    $eventData["end"] = [ "timezone" => "UTC", "utc" => $endDate];
 } else{
     $details['schedule'] = scheduleEvent($event_id, $scheduleData);
 }
