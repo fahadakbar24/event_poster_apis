@@ -251,10 +251,10 @@ function publishEvent($evtId, $allowPublish = true){
 
 function createEventSchedule($evtId, $schedule){}
 
-function fetchAllOrgEvents(){
+function fetchAllOrgEvents($orgId){
     $response = makeEBApiReq(
         "get",
-        "/organizations/{$_SESSION['eb_org_details'][0]['id']}/events/",
+        "/organizations/$orgId/events/?status=all",
         "",
         []
     );
