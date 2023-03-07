@@ -4,7 +4,7 @@ require_once "functions.php";
 
 verifyUpdateParams();
 
-$event_id = $_GET['event_id'];
+$eventId = $_GET['eventId'];
 
 $dateFormat = "Y-m-d\TH:i:s\Z";
 $today = date($dateFormat);
@@ -40,16 +40,16 @@ RRULE:FREQ=MONTHLY;BYDAY=1WE;COUNT=7"
     ]
 ];
 
-$details["old"] = fetchEvent($event_id);
+$details["old"] = fetchEvent($eventId);
 
 if(empty($details["old"]["is_series"])){
     $eventData["start"] = [ "timezone" => "UTC", "utc" => $startDate ];
     $eventData["end"] = [ "timezone" => "UTC", "utc" => $endDate];
 } else{
-    $details['schedule'] = scheduleEvent($event_id, $scheduleData);
+    $details['schedule'] = scheduleEvent($eventId, $scheduleData);
 }
 
-$details['event'] = updateEvent($event_id, $newEventData);
-$details['ticket'] = updateTickets($event_id, $newTicketData);
+$details['event'] = updateEvent($eventId, $newEventData);
+$details['ticket'] = updateTickets($eventId, $newTicketData);
 
 printVars($details);

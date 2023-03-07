@@ -6,8 +6,8 @@ $dateFormat = "Y-m-d\TH:i:s\Z";
 $today = date($dateFormat);
 $startDate = date($dateFormat, strtotime($today. ' + 0 days'));
 $endDate = date($dateFormat, strtotime($today. ' + 12 hours'));
-uploadImage();
-die();
+//uploadImage();
+//die();
 
 
 $eventData = [

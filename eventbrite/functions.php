@@ -3,7 +3,7 @@ $configs = include("../config.php");
 include("../globalfunctions.php");
 
 function verifyUpdateParams(){
-    if(!isset($_GET["event_id"]) || empty($_GET["event_id"])){
+    if(empty($_GET["eventId"])){
         die("No Event Id specified.");
     }
 }
@@ -243,7 +243,7 @@ function fetchAllOrgEvents($orgId){
         printError("Error retrieving events", $response);
     }
 
-    return isset($response["events"]) ? $response["events"] : [];
+    return $response;
 }
 
 function deleteEvent($event_id){
@@ -261,4 +261,16 @@ function deleteEvent($event_id){
     }
 
     printVars($response);
+}
+
+function deleteAllEvents(){
+    $eventInfo = fetchAllOrgEvents($_SESSION['eb_org_details'][0]['id']);
+
+    if(!$eventInfo["pagination"]["object_count"]){
+        printError("No Events found");
+    }
+
+    foreach ($eventInfo["events"] as $event){
+        deleteEvent($event["id"]);
+    }
 }
