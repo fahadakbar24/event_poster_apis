@@ -13,14 +13,6 @@ $newEventData = [
     "event" => [
         'name' => ['html' => 'Updated Event Name'],
         'description' => ['html' => 'Updated Event Description'],
-        "start" => [
-            "timezone" => "UTC",
-            "utc" => date($dateFormat, strtotime($today. ' + 6 days'))
-        ],
-        "end" => [
-            "timezone" => "UTC",
-            "utc" => date($dateFormat, strtotime($today. ' + 8 days'))
-        ],
         'currency' => 'USD',
         'online_event' => false,
         'listed' => true,
@@ -38,7 +30,31 @@ $newTicketData = [
     ]
 ];
 
-$eventDetails = updateEvent($event_id, $newEventData);
-updateTickets($event_id, $newTicketData);
+$scheduleData = [
+    "schedule" => [
+        "occurrence_duration" => 3600,
+        "recurrence_rule" => "DTSTART:20230305T023000Z
+RRULE:FREQ=MONTHLY;BYDAY=1WE;COUNT=7"
+    ]
+];
 
+$details["old"] = fetchEvent($event_id);
 
+if(empty($details["old"]["is_series"])){
+    $eventData["start"] = [
+        "timezone" => "UTC",
+        "utc" => date($dateFormat, strtotime($today. ' + 6 days'))
+    ];
+
+    $eventData["end"] = [
+        "timezone" => "UTC",
+        "utc" => date($dateFormat, strtotime($today. ' + 8 days'))
+    ];
+} else{
+    $details['schedule'] = scheduleEvent($event_id, $scheduleData);
+}
+
+$details['event'] = updateEvent($event_id, $newEventData);
+$details['ticket'] = updateTickets($event_id, $newTicketData);
+
+printVars($details);

@@ -61,7 +61,12 @@ RRULE:FREQ=MONTHLY;BYDAY=1WE;COUNT=5"
     ]
 ];
 
-$eventDetails = createEvent($eventData);
-scheduleEvent($eventDetails["series_id"], $scheduleData);
-createTickets($eventDetails["id"], $ticketData);
-publishEvent($eventDetails["id"]);
+$details['event'] = createEvent($eventData);
+if(!empty($eventData["event"]["is_series"])){
+    $details['schedule'] = scheduleEvent($details['event']["series_id"], $scheduleData);
+}
+
+$details['ticket'] = createTickets($details['event']["id"], $ticketData);
+$details['publishStatus'] = publishEvent($details['event']["id"]);
+
+printVars($details);

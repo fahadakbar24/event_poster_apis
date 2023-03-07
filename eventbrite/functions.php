@@ -135,35 +135,19 @@ function createEvent($evtData){
     );
 
     if (!isset($response["id"])) {
-        echo "Error creating event on Eventbrite";
-    } else {
-        echo "Created event on Eventbrite: ";
+        printError("Error creating event on Eventbrite", $response);
     }
 
-    printVars($response);
     return $response;
 }
 function scheduleEvent($eventId, $scheduleData){
-    $ch = curl_init();
+    $response = makeEBApiReq("post", "events/{$eventId}/schedules/", json_encode($scheduleData));
 
-    curl_setopt($ch, CURLOPT_URL, "https://www.eventbriteapi.com/v3/events/{$eventId}/schedules/");
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-    curl_setopt($ch, CURLOPT_HEADER, FALSE);
+    if(!isset($response['id'])){
+        printError("Error Scheduling Event dates", $response);
+    }
 
-    curl_setopt($ch, CURLOPT_POST, TRUE);
-
-    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($scheduleData));
-
-    curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-        "Authorization: Bearer {$_SESSION['eb_access_token_details']['access_token']}",
-        "Content-Type: application/json"
-    ));
-
-    $response = curl_exec($ch);
-    curl_close($ch);
-
-    var_dump($response);
-
+    return $response;
 }
 
 function createTickets($evtId, $ticketData){
@@ -174,12 +158,9 @@ function createTickets($evtId, $ticketData){
     );
 
     if(!isset($response['id'])){
-        echo "Error creating ticket";
-    } else {
-        echo "Ticket added successfully. \n";
+        printError("Error creating ticket", $response);
     }
 
-    printVars($response);
     return $response;
 }
 
@@ -210,13 +191,10 @@ function updateTickets($evtId, $ticketData){
         []
     );
 
-    if(!isset($response['id'])){
-        echo "Error updating ticket";
-    } else {
-        echo "Ticket updated successfully. \n";
+    if(!isset($response['id'])) {
+        printError("Error updating ticket", $response);
     }
 
-    printVars($response);
     return $response;
 }
 
@@ -229,27 +207,29 @@ function updateEvent($evtId, $evtData){
     );
 
     if (!$response["id"]) {
-
-    } else {
-        echo "Event updated successfully";
+        printError("Error updating Event", $response);
     }
 
-    printVars($response);
     return $response;
 }
 
 function publishEvent($evtId, $allowPublish = true){
-    $response = makeEBApiReq(
+    return makeEBApiReq(
         "post",
         "events/{$evtId}/". ($allowPublish?'':'un') ."publish/",
         "",
         []
     );
-
-    printVars($response);
 }
+function fetchEvent($eventId){
+    $response = makeEBApiReq( "get", "/events/$eventId/","", []);
 
-function createEventSchedule($evtId, $schedule){}
+    if (!isset($response["id"])) {
+        printError("Error retrieving events", $response);
+    }
+
+    return $response;
+}
 
 function fetchAllOrgEvents($orgId){
     $response = makeEBApiReq(
@@ -260,13 +240,9 @@ function fetchAllOrgEvents($orgId){
     );
 
     if (!isset($response["events"])) {
-        echo "Error retrieving events";
-    } else {
-        echo "Events are: ";
-
+        printError("Error retrieving events", $response);
     }
 
-    printVars($response);
     return isset($response["events"]) ? $response["events"] : [];
 }
 
