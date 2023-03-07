@@ -4,10 +4,10 @@ include("functions.php");
 
 $dateFormat = "Y-m-d\TH:i:s\Z";
 $today = date($dateFormat);
-$stardDate = date($dateFormat, strtotime($today. ' + 0 days'));
+$startDate = date($dateFormat, strtotime($today. ' + 0 days'));
 $endDate = date($dateFormat, strtotime($today. ' + 12 hours'));
-//uploadImage();
-//die();
+uploadImage();
+die();
 
 
 $eventData = [
@@ -16,7 +16,7 @@ $eventData = [
         "description" => [ "html" => "Some text" ],
         "start" => [
             "timezone" => "UTC",
-            "utc" => $stardDate
+            "utc" => $startDate
         ],
         "end" => [
             "timezone" => "UTC",
