@@ -101,12 +101,22 @@ function createEvent($evtData){
           dateTime
           duration
         }
+        errors {
+          message
+          code
+          field
+        }
       }
     }
     QUERY;
 
     $response = makeMUApiReq("post", $query, [ 'input' => $evtData ]);
-    printVars( $response );
+
+    if (isset($response['errors']) || !empty($response['data']['createEvent']['errors'])) {
+        printError('Error creating event:', $response) ;
+    }
+
+    return $response;
 }
 
 function fetchEvents($groupId){
@@ -148,8 +158,7 @@ function fetchEvents($groupId){
         printError("Error Fetching events", $response);
     }
 
-    $response['groupId'] = $groupId;
-    return $response;
+    return $response['data']['group'];
 }
 function deleteEvent($eventId){
     $query = <<<GRAPHQL
@@ -165,21 +174,28 @@ function deleteEvent($eventId){
         }
     GRAPHQL;
 
-    $response = makeMUApiReq("post", $query, [ "input" => [ "eventId" => "$eventId"]]);
+    $response = makeMUApiReq("post", $query, [ "input" => [
+        "eventId" => "$eventId",
+        "removeFromCalendar" => true,
+        "updateSeries" => true
+    ]]);
 
-    if(isset($data['errors'])) {
-        echo "Error: " . $data['errors'][0]['message'];
-    } else {
-        echo "Event deleted successfully.";
+    if(isset($response['deleteEvent']['errors'])) {
+        printError("Error deleting event.", $response);
     }
 
-    printVars($response);
     return $response;
 }
 function deleteAllEvents(){
     $eventDetails = fetchEvents($_SESSION['mu_groups_details'][0]['node']['id']);
-    foreach ($eventDetails['edges'] as $event){
-        deleteEvent($event['node']['id']);
+    $events = $eventDetails['unifiedEvents']['edges'];
+    if(empty($events)){
+        printError("No Events to delete");
+    }
+
+    foreach ($events as $event){
+        $deleteResponse = deleteEvent($event['node']['id']);
+        printVars($deleteResponse);
     }
 }
 
@@ -194,6 +210,11 @@ function updateEvent($newEventData){
                     dateTime
                     duration 
                 }
+                errors {
+                  message
+                  code
+                  field
+                }
             }
         }
     QUERY;
@@ -201,12 +222,9 @@ function updateEvent($newEventData){
     $response = makeMUApiReq("post", $query, ['input' => $newEventData, ]);
 
     // Check for errors
-    if (isset($response['errors'])) {
-        echo 'Error updating event:' ;
-    } else {
-        echo 'Event updated: ' ;
+    if (isset($response['errors']) || !empty($response['data']['editEvent']['errors'])) {
+        printError('Error updating event:', $response) ;
     }
 
-    printVars($response);
     return $response;
 }
