@@ -15,11 +15,14 @@ $imgData = [
     'published' => 'false'
 ];
 $imgUploadInfo = storePagePhoto($pageInfo['id'], $imgData);
-printVars($imgUploadInfo, "Image uploaded to Facebook Page");
 
 $newPostData = array(
     "access_token" => $pageInfo['access_token'],
-    "message" => "New description for the post"
+    "message" => "New description for the post
+    
+Check out this UPDATED link! 
+https://developers.facebook.com/docs/graph-api/reference/v16.0/page/feed
+"
 );
 
 if(isset($imgUploadInfo['id'])){
@@ -29,4 +32,6 @@ if(isset($imgUploadInfo['id'])){
 }
 
 $postInfo = editPost($_GET['post_id'], $newPostData);
+$postInfo['imgUploadInfo'] = $imgUploadInfo;
+
 printVars($postInfo, "Message updated to Facebook Page");

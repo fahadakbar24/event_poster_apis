@@ -13,7 +13,6 @@ $imgData = [
     'published' => 'false'
 ];
 $imgUploadInfo = storePagePhoto($pageInfo['id'], $imgData);
-printVars($imgUploadInfo, "Image uploaded to Facebook Page");
 
 $postData = [
     "access_token" => $pageInfo['access_token'],
@@ -34,4 +33,5 @@ if(isset($imgUploadInfo['id'])){
     ];
 }
 $postInfo = createPost( $pageInfo['id'], $postData);
+$postInfo['imgUploadInfo'] = $imgUploadInfo;
 printVars($postInfo, "Message posted to Facebook Page");

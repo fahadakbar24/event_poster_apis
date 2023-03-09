@@ -53,15 +53,18 @@ function getLongAccessToken($shortAccessToken){
         ""
     );
 }
-function getPageAccessTokens(){
-
-    $_SESSION['fb_page_details'] = makeFBApiReq(
+function getPageAccessTokens($accessToken){
+    $response = makeFBApiReq(
         "get",
-        "me/accounts?access_token={$_SESSION['fb_access_token_details']['access_token']}",
+        "me/accounts?access_token={$accessToken}",
         ""
     );
 
-    return $_SESSION['fb_page_details'];
+    if(isset($response['error'])){
+        printError("Error Obtaining page access tokens", $response);
+    }
+
+    return $response;
 }
 function getPageInfo($pageName){
     return array_filter($_SESSION['fb_page_details']['data'], function ($curPageInfo) {
@@ -127,9 +130,8 @@ function deletePagePosts($post_id, $access_token){
     );
 
     if (!isset($response["success"])) {
-        echo "Error deleting post from Facebook Page\n";
-        printVars($response);
-    } else {
-        echo "Deleted post from Facebook Page\n";
+        printError("Error deleting post from Facebook Page\n", $response);
     }
+
+    return $response;
 }

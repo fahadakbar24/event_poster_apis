@@ -10,10 +10,12 @@ if(!empty($_GET['refresh'])){
     $pagePostIds = fetchPagePostIds($pageInfo['id'], $pageInfo['access_token']);
 
     foreach ($pagePostIds as $postId){
-        deletePagePosts($postId, $pageInfo['access_token']);
+        $deleteResp = deletePagePosts($postId, $pageInfo['access_token']);
+        printVars($deleteResp, "Post Deleted Successfully");
     }
 }else{
     validatePageParams();
-    deletePagePosts($_GET['post_id'], $pageInfo['access_token']);
+    $deleteResp = deletePagePosts($_GET['post_id'], $pageInfo['access_token']);
+    printVars($deleteResp, "Post Deleted Successfully");
 }
 
