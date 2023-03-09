@@ -124,6 +124,17 @@ function fetchEvents($groupId){
               description
               dateTime
               duration
+              eventUrl
+              images{
+                id
+                baseUrl
+                preview
+              }
+              imageUrl
+              status
+              timeStatus
+              endTime
+              createdAt
             }
           }
         }
@@ -132,11 +143,12 @@ function fetchEvents($groupId){
     GRAPHQL;
 
     $response = makeMUApiReq("post", $query, ['groupId' => $groupId]);
-    printVars(['groupId' => $groupId]);
-    if(isset($response['data']['group']['unifiedEvents'])){
-        $response = $response['data']['group']['unifiedEvents'];
+
+    if(!isset($response['data']['group']['unifiedEvents'])){
+        printError("Error Fetching events", $response);
     }
-    printVars($response);
+
+    $response['groupId'] = $groupId;
     return $response;
 }
 function deleteEvent($eventId){
@@ -145,7 +157,7 @@ function deleteEvent($eventId){
             deleteEvent(input: \$input) {
                 success
                 errors {
-                        message
+                  message
                   code
                   field
                 }
