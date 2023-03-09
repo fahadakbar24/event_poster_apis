@@ -2,9 +2,12 @@
 
 function printVars($var, $message=""){
     echo "<br/>$message<br/>";
-    echo "<pre>";
-        print_r($var);
-    echo "<pre/><br/>";
+
+    if(!empty($var)){
+        echo "<pre>";
+            print_r($var);
+        echo "<pre/><br/>";
+    }
 }
 
 function printError($msg, $errorInfoObj=[]){
