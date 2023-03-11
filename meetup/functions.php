@@ -135,6 +135,7 @@ function fetchEvents($groupId){
               dateTime
               duration
               eventUrl
+              shortUrl
               images{
                 id
                 baseUrl

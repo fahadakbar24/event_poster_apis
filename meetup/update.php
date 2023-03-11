@@ -19,6 +19,7 @@ if(empty($_GET['eventId'])){
         'duration' => "P2D",
         'publishStatus' => 'PUBLISHED',
         'featuredPhotoId' => 0,
+//        'applyToSeries' => true,
         'recurring' => [
             'enabled' => true,
             'settings' => [
